@@ -8,14 +8,15 @@ int n, m, nGV = 0, numRes = 0;
 bool assign[101][61] = {};
 vector<pair<int, int>> c;
 vector<node*> gv[101], res;
+
 void greedy(){
     for(int teacher = 1; teacher <= nGV; ++teacher){
         bool teached[61] = {};
         for(node *subject : gv[teacher]){
             int t = subject->t;
             for(int room = subject->s; room <= m; ++room) {
-                for(int tBegin = 1; tBegin <= 60; ++tBegin){
-                    if((tBegin+t)/12 != tBegin/12) continue;
+                for(int tBegin = 1; tBegin+t <= 60; ++tBegin){
+                    // if((tBegin+t)/12 != tBegin/12) continue;
                     int check = 0;
                     for(int period = 0; period < t; ++period){
                         if(teached[tBegin+period] != 0 || assign[room][tBegin+period] != 0){
@@ -40,7 +41,6 @@ void greedy(){
 }
 
 int main(){
-    freopen("D:\\Learning\\.vscode\\Hust-problem\\TULKH\\test case\\inp1.txt", "r", stdin);
     cin >> n >> m;
     for(int i = 1; i <= n; i++){
         int t, g, s;
