@@ -7,17 +7,13 @@ int best = 0, solution[1001], curr = 0;
 bool assigned[1001];
 clock_t start, stop;
 
+// update continuously 
 void update(){
-    // cout << curr << endl; 
     if(best < curr){
         best = curr;
         for(int i = 1; i <= n; ++i){
             solution[i] = subject[i][3];
         }
-// cout << best << endl;
-// for(int i = 1; i <= n; i++){
-//     if(solution[i]) cout << i << " " << solution[i] % 60 << " " << solution[i] / 60 + 1 << endl;
-// }
     }
 }
 
@@ -40,27 +36,31 @@ bool check(int sub, int tiet){
 
 void assign(int sub, int tiet){
     stop = clock();
-    if(stop - start > 1000 || !check(sub, tiet) || tiet >= n*60){
+    // check time stop condition, check valid solution and not over number of rooms
+    if(stop - start > 100000 || !check(sub, tiet) || tiet > m*60-4){
         update();
         return;
     }
-    if(stop - start > 10 * t){
+    // check time stop condition 
+    if(stop - start > 100000 * t){
         update();
         ++t;
     }
+    // come here is this branch pass the check valid 
+    // so assign it
     subject[sub][3] = tiet;
     ++curr;
     assigned[sub] = true;
-    // int num = max(n - 2*curr, n / 3);
-
-    // if(60 - tiet % 60 < 4) tiet = ((int) (tiet / 60) + 1) * 60 - 1;
+    
     if(n*60-tiet >  (best-curr)*4){
         vector<int> constrain = constraint[subject[sub][1]];
+        // continue assign subject from same teacher
         for(int i : constrain){
             if(!assigned[i]){
                 assign(i, tiet + subject[sub][0] + 1);
             }
         }
+        // try assign subject by first fit
         for(int i = 1; i <= n; i++){
             if(!assigned[i] && subject[sub][1] != subject[i][1]){
                 assign(i, tiet + subject[sub][0] + 1);
@@ -75,18 +75,21 @@ void assign(int sub, int tiet){
 }
 
 int main(){
-    // freopen("inp.txt", "r", stdin);
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
     start = clock();
     cin >> n >> m;
     for(int i = 1; i <= n; i++){
+        // input each element in subject (t[i], g[i], s[i])
         cin >> subject[i][0] >> subject[i][1] >> subject[i][2];
+        // mark -1 mean not assigned yet
         subject[i][3] = -1;
+        // add subject to the teacher constraint
         constraint[subject[i][1]].push_back(i);
         numTeacher = max(numTeacher, subject[i][1]);
     }
+    // input c[i]
     for(int i = 1; i <= m; i++){
         cin >> room[i];
     }
@@ -97,8 +100,4 @@ int main(){
     for(int i = 1; i <= n; i++){
         if(solution[i] > -1) cout << i << " " << solution[i]%60+1 << " " << solution[i]/60+1 << endl;
     }
-    // cout << ((subject[14][3]+subject[14][0])%60 - subject[1][3]%60) * ((subject[1][3]+subject[1][0])%60 - subject[14][3]%60) << endl;
-    
-    // vector<int> constrain = constraint[subject[1][1]];
-    // for(int i : constrain) cout << i << " ";
 }
